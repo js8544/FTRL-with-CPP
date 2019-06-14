@@ -77,7 +77,7 @@ public:
 		for(int i=0;i<data.size();i++){
 			cout<<"data "<<i<<endl;
 			int p=0;
-			if(predict(data[i].x)>0.5){
+			if(perdict(data[i].x)>0.5){
 				p = 1;
 			}
 			if(p==data[i].y){
