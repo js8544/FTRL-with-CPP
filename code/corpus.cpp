@@ -2,7 +2,7 @@
 #include <algorithm>
 using namespace std;
 
-vector<string> parse_feature(string s, const string del){
+vector<string> parse_feature(string s, const string del){//same as python string.split(string, delimiter)
 	size_t pos = 0;
 	string token;
 	vector<string> ret;
@@ -16,7 +16,7 @@ vector<string> parse_feature(string s, const string del){
 	return ret;
 }
 
-corpus::corpus(ifstream* File){
+corpus::corpus(ifstream* File){//file is of form "y x1:v1 x2:v2 ..."
 	file = File;
 	d = 0;
 	string line;

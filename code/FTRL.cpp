@@ -71,6 +71,23 @@ public:
 
 	double test(corpus& data){
 		cout<<"testing "<<data.size()<<" data"<<endl;
+		double correct = 0;
+		double wrong = 0;
+
+		for(int i=0;i<data.size();i++){
+			cout<<"data "<<i<<endl;
+			int p=0;
+			if(predict(data[i].x)>0.5){
+				p = 1;
+			}
+			if(p==data[i].y){
+				correct++;
+			}
+			else{
+				wrong++;
+			}
+		}
+		return correct/(correct+wrong);
 	}
 };
 
@@ -80,7 +97,8 @@ int main(int argc, char const *argv[])
 	FILE.open(argv[1]);
 	corpus train_set(&FILE);
 	
-	FTRL ftrl(train_set.d, 0.5, 1, 1, 1);
+	FTRL ftrl(train_set.d, 0.5, 1, 0, 0);
 	ftrl.train(train_set);
+	ftrl.test(train_set);
 	return 0;
 }
