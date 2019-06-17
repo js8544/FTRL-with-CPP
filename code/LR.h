@@ -16,7 +16,7 @@ public:
 	LR(){};
 	inline double decision(SpVec w, SpVec x){
 		//Sigmoid Decision Function
-		return 1.0 / (1.0 + exp(w.dot(x)));
+		return 1.0 / (1.0 + exp(-w.dot(x)));
 	}
 
 	inline double loss(double p, double y){

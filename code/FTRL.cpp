@@ -62,6 +62,7 @@ public:
 	void train(corpus& data){
 		cout<<"training "<<data.size()<<" data"<<endl;
 		for(int i=0;i<data.size();i++){
+		// for(int i=0;i<2000;i++){
 			cout<<"round "<<i<<endl;
 			cout<<"loss: "<<update(data[i].x,data[i].y)<<endl;
 		}
@@ -75,7 +76,7 @@ public:
 		double wrong = 0;
 
 		for(int i=0;i<data.size();i++){
-			cout<<"data "<<i<<endl;
+			cout<<"data "<<i<<":"<<perdict(data[i].x)<<"--"<<data[i].y<<endl;
 			int p=0;
 			if(perdict(data[i].x)>0.5){
 				p = 1;
@@ -93,12 +94,21 @@ public:
 
 int main(int argc, char const *argv[])
 {
+	cout<<"creating train set\n";
 	ifstream FILE;
 	FILE.open(argv[1]);
 	corpus train_set(&FILE);
-	
+
+	cout<<"creating test set\n";
+	ifstream TEST;
+	TEST.open(argv[2]);
+	corpus test_set(&TEST);
+
+	cout<<"training\n";
 	FTRL ftrl(train_set.d, 0.5, 1, 0, 0);
 	ftrl.train(train_set);
-	ftrl.test(train_set);
+
+	cout<<"testing\n";
+	cout<<"accuracy: "<<ftrl.test(test_set)<<endl;
 	return 0;
 }
