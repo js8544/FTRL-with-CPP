@@ -5,6 +5,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <algorithm>
 
 #include "sparse_vector.h"
 
@@ -22,10 +23,8 @@ struct data_str{//data struct
 
 class corpus
 {
-private:
-	ifstream *file;
-
 public:
+	ifstream *file;
 	long d;
 	vector<data_str> data;
 	corpus(ifstream *File);//when the file is given in a sparse pattern, i.e. feature:value

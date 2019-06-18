@@ -1,5 +1,4 @@
 #include "corpus.h"
-#include <algorithm>
 using namespace std;
 
 vector<string> parse_feature(string s, const string del){//same as python string.split(string, delimiter)

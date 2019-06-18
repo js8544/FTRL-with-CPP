@@ -8,6 +8,7 @@ typedef std::unordered_map<long, double> sp_type;
 typedef std::unordered_map<long, double>::iterator sp_iter;
 
 using namespace std;
+
 class sparse_vector
 {
 private:
@@ -22,9 +23,24 @@ public:
 	
 	sparse_vector(const sparse_vector& sp):vc(sp.vc),iter(vc.begin()){};
 
-	double get_value(long i);
+	inline double get_value(long i){
+		sp_iter it = vc.find(i);
+		if(it!=vc.end()){
+			return it->second;
+		}
+		else{
+			return 0;
+		}
+	};
 
-	void set_value(long i, double v);
+	inline void set_value(long i, double v){
+		if(v!=0){
+			vc[i] = v;
+		}
+		else{
+			vc.erase(i);
+		}
+	}
 
 	inline long size(){
 		return vc.size();
