@@ -12,6 +12,8 @@ typedef sparse_vector SpVec;
 
 using namespace std;
 
+vector<string> parse_feature(string s, const string del);
+
 struct data_str{//data struct
 	SpVec x;
 	double y;

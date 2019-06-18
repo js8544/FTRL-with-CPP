@@ -11,10 +11,11 @@ using namespace std;
 class sparse_vector
 {
 private:
-	sp_type vc;
 	sp_iter iter;
 
 public:
+	sp_type vc;
+	
 	sparse_vector(vector<pair<long,double> >& content);
 	
 	sparse_vector(void):vc(),iter(vc.begin()){};
