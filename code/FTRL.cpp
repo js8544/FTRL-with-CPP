@@ -109,7 +109,7 @@ public:
 		#pragma omp parallel for
 		for(int i=0;i<data.size();i++){
 
-			cout<<"data "<<i<<":"<<perdict(data[i].x)<<"--"<<data[i].y<<endl;
+			// cout<<"data "<<i<<":"<<perdict(data[i].x)<<"--"<<data[i].y<<endl;
 			int p=0;
 			if(perdict(data[i].x)>0.5){
 				p = 1;
