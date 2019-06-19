@@ -44,7 +44,6 @@ public:
 	}
 
 	double update(SpVec& x, double y){
-
 		#pragma omp parallel for
 		for(int i = 0;i < d;++i){
 			if(abs(z.get_value(i)) > l1){
