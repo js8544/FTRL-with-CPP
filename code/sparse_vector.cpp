@@ -6,24 +6,7 @@ sparse_vector::sparse_vector(std::vector< std::pair< long, double> >& content):v
 	}
 }
 
-double sparse_vector::get_value(long i){
-	sp_iter it = vc.find(i);
-	if(it!=vc.end()){
-		return it->second;
-	}
-	else{
-		return 0;
-	}
-}
 
-void sparse_vector::set_value(long i, double v){
-	if(v!=0){
-		vc[i] = v;
-	}
-	else{
-		vc.erase(i);
-	}
-}
 
 sparse_vector sparse_vector::operator+(double s){
 	sparse_vector res(*this);

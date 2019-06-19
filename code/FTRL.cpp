@@ -5,6 +5,7 @@
 #include <cmath>
 #include <string>
 #include <iomanip>
+#include <omp.h>
 // #include <omp.h>
 // #include <pthread.h>
 using namespace std;
@@ -43,36 +44,45 @@ public:
 	}
 
 	double update(SpVec& x, double y){
+
+		#pragma omp parallel for
 		for(int i = 0;i < d;++i){
 			if(abs(z.get_value(i)) > l1){
+				#pragma omp critical
 				w.set_value(i,-1.0/((beta+sqrt(n.get_value(i)))/alpha+l2)*(z.get_value(i)-sgn(z.get_value(i))*l1));
 			}
 			else{
+				#pragma omp critical
 				w.set_value(i,0);
 			}
 		}
 		double p = perdict(x);
 		SpVec g = lr.gradient(p,y,x);
+
+		#pragma omp parallel for
 		for(int i = 0;i < d;i++){
-			g.set_value(i, (p-y)*(x.get_value(i)));
-			double sigma = (1.0/alpha)*(sqrt(n.get_value(i)+(g.get_value(i)*g.get_value(i)))-sqrt(n.get_value(i)));
-			z.set_value(i,z.get_value(i)+g.get_value(i)-sigma*w.get_value(i));
-			n.set_value(i,n.get_value(i)+g.get_value(i)*g.get_value(i));
+			double temp_g = (p-y)*(x.get_value(i));
+			g.set_value(i, temp_g);
+			double sigma = (1.0/alpha)*(sqrt(n.get_value(i)+(temp_g*temp_g))-sqrt(n.get_value(i)));
+			double temp_z = z.get_value(i)+temp_g-sigma*w.get_value(i);
+			double temp_n = n.get_value(i)+temp_g*temp_g;
+			
+			#pragma omp critical
+			z.set_value(i,temp_z);
+			#pragma omp critical
+			n.set_value(i,temp_n);
 		}
 
 		return lr.loss(p,y);
 	}
 
-	// #pragma omp parallel
 	void train(corpus& data){
 		cout<<"training "<<data.size()<<" data"<<endl;
 		double correct = 0;
 		double wrong = 0;
 
-		// #pragma omp for
 		for(int i=0;i<data.size();i++){
-		// for(int i=0;i<200;i++){
-			cout<<"round "<<i<<" ";
+			cout<<"data "<<i<<" ";
 			int p = (perdict(data[i].x)>0.5);
 			double loss = update(data[i].x,data[i].y);
 
@@ -97,8 +107,8 @@ public:
 		double correct = 0;
 		double wrong = 0;
 
+		#pragma omp parallel for
 		for(int i=0;i<data.size();i++){
-		// for(int i=0;i<200;i++){
 
 			cout<<"data "<<i<<":"<<perdict(data[i].x)<<"--"<<data[i].y<<endl;
 			int p=0;

@@ -1,3 +1,4 @@
 ftrl
 data
-*.binary
+doc/*.md
+doc/*.png
