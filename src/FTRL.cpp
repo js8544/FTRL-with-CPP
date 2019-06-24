@@ -13,11 +13,10 @@
 // #include <pthread.h>
 using namespace std;
 
-#define BUF_SIZE 1024
 #define SHM_KEY 0x1234
 
 struct shmseg {
-	int mode; //0: user_id ready, 1: ad_id ready, 2:feedback ready
+	int mode; //-1:waiting, 0: user_id ready, 1: ad_id ready, 2:feedback ready
    	long long user_id;
    	long long ad_id;
    	bool feedback; 
@@ -235,6 +234,8 @@ int main(int argc, char const *argv[])
 		perror("Shared memory attach");
 		return 1;
 	}
+
+	shmp->mode = -1;
 
 	while(1){
 		if(shmp->mode==0){
