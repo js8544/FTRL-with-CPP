@@ -123,9 +123,22 @@ public:
 		return correct/(correct+wrong);
 	}
 
-	void save(ofstream* FILE){
+void save(ofstream* FILE){
+		(*FILE)<<"w:\n";
 		sp_iter it = w.vc.begin();
 		while(it!=w.vc.end()){
+			(*FILE)<<it->first<<": "<<it->second<<endl;
+			it++;
+		}
+		(*FILE)<<"z:\n";
+		it = z.vc.begin();
+		while(it!=z.vc.end()){
+			(*FILE)<<it->first<<": "<<it->second<<endl;
+			it++;
+		}
+		(*FILE)<<"n:\n";
+		it = n.vc.begin();
+		while(it!=n.vc.end()){
 			(*FILE)<<it->first<<": "<<it->second<<endl;
 			it++;
 		}
@@ -133,12 +146,22 @@ public:
 
 	void load(ifstream* FILE){
 		string line;
+		SpVec* cur;
 		while(getline(*FILE,line)){
+			if(line=="w:"){
+				cur = &w;
+			}
+			else if(line=="z:"){
+				cur = &z;
+			}
+			else if(line=="n:"){
+				cur = &n;
+			}
 			vector<string> temp = parse_feature(line,":");
 			
 			long x = stoi(temp[0]);
 			double v = stod(temp[1]);
-			w.set_value(x,v);
+			cur->set_value(x,v);
 		}
 	}
 };
