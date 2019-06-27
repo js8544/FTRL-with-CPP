@@ -6,21 +6,8 @@
 #include <string>
 #include <iomanip>
 #include <omp.h>
-#include <sys/ipc.h>
-#include <sys/shm.h>
-#include <map>
-// #include <omp.h>
-// #include <pthread.h>
+
 using namespace std;
-
-#define SHM_KEY 0x1234
-
-struct shmseg {
-	int mode; //-1:waiting, 0: user_id ready, 1: ad_id ready, 2:feedback ready
-   	long long user_id;
-   	long long ad_id;
-   	bool feedback; 
-};
 
 inline int sgn(double a){
 	return (0<a)-(a>0);
@@ -160,116 +147,60 @@ int main(int argc, char const *argv[])
 {
 
 
-	// if(string(argv[1])=="-train"){
-	// 	if(argc!=4){
-	// 		cout<<"Usage: ./ftrl -train [train data] [model save location]\n";
-	// 		return 0;
-	// 	}
-	// 	cout<<"creating train set\n";
+	if(string(argv[1])=="-train"){
+		if(argc!=4){
+			cout<<"Usage: ./ftrl -train [train data] [model save location]\n";
+			return 0;
+		}
+		cout<<"creating train set\n";
+
+		ifstream FILE;
+		FILE.open(argv[2]);
+		corpus train_set(&FILE);
+		FTRL ftrl(train_set.d, 0.5, 1, 1, 1);
+
+		cout<<"training\n";
+		ftrl.train(train_set);
 
 
-	// FTRL ftrl(train_set.d, 0.5, 1, 1, 1);
+		ofstream SAVE;
+		SAVE.open(argv[3]);
+		cout<<"saving trained model\n";
+		ftrl.save(&SAVE);
 
-	// 	cout<<"training\n";
-	// 	ftrl.train(train_set);
+		FILE.close();
+		SAVE.close();
+	}
 
-
-	// 	ofstream SAVE;
-	// 	SAVE.open(argv[3]);
-	// 	cout<<"saving trained model\n";
-	// 	ftrl.save(&SAVE);
-
-	// 	FILE.close();
-	// 	SAVE.close();
-	// }
-
-	// else if(string(argv[1])=="-test"){
-	// 	if(argc!=4){
-	// 		cout<<"Usage: ./ftrl -test [test data] [model save location]\n";
-	// 		return 0;
-	// 	}
+	else if(string(argv[1])=="-test"){
+		if(argc!=4){
+			cout<<"Usage: ./ftrl -test [test data] [model save location]\n";
+			return 0;
+		}
 		
-	// 	cout<<"creating test set\n";
-	// 	ifstream TEST;
-	// 	TEST.open(argv[2]);
-	// 	corpus test_set(&TEST);
+		cout<<"creating test set\n";
+		ifstream TEST;
+		TEST.open(argv[2]);
+		corpus test_set(&TEST);
 
-	// 	FTRL ftrl(test_set.d, 0.5, 1, 0, 0);
+		FTRL ftrl(test_set.d, 0.5, 1, 1, 1);
 
-	// 	cout<<"loading model\n";
-	// 	ifstream LOAD;
-	// 	LOAD.open(argv[3]);
-	// 	ftrl.load(&LOAD);
-
-
-	// 	cout<<"testing\n";
-	// 	cout<<"accuracy: "<<ftrl.test(test_set)<<endl;
-
-	// 	LOAD.close();
-	// 	TEST.close();
-	// }
-
-	// else{
-	// 	cout<<"Usage: ./ftrl -train [train data] [model save location]\nUsage: ./ftrl -test [model save location] [test data]\n";
-	// }
+		cout<<"loading model\n";
+		ifstream LOAD;
+		LOAD.open(argv[3]);
+		ftrl.load(&LOAD);
 
 
-	FTRL ftrl(1000, 0.5, 1, 1, 1);
+		cout<<"testing\n";
+		cout<<"accuracy: "<<ftrl.test(test_set)<<endl;
 
-	ifstream FILE;
-	FILE.open(argv[2]);
-	corpus train_set(&FILE);
-
-	int shmid;
-	shmid = shmget(SHM_KEY, sizeof(struct shmseg), 0644|IPC_CREAT);
-	if (shmid == -1) {
-	  perror("Shared memory");
-	  return 1;
+		LOAD.close();
+		TEST.close();
 	}
 
-	shmseg *shmp;
-
-	shmp = (struct shmseg*) shmat(shmid, NULL, 0);
-	if (shmp == (void *) -1) {
-		perror("Shared memory attach");
-		return 1;
+	else{
+		cout<<"Usage: ./ftrl -train [train data] [model save location]\nUsage: ./ftrl -test [model save location] [test data]\n";
 	}
 
-	shmp->mode = -1;
-
-	while(1){
-		if(shmp->mode==0){
-			sparse_vector user = get_user_feature(shmp->user_id);
-			map<int,sparse_vector> ad = get_ads();
-
-			double res = 1;
-			int ad_id;
-			for(auto x: ad){
-				double p = ftrl.perdict(x.second);
-				if(p<res){
-					res = p;
-					ad_id = x.first;
-				}
-			}
-
-			shmp->ad_id = ad_id;
-			shmp->mode = 1;
-		}
-
-		if(shmp->mode==2){
-			sparse_vector ad = get_ad(shmp->ad_id);
-			double y = (double) shmp->feedback;
-			ftrl.update(ad,y);
-			shmp->mode = 0;
-		}
-	}
-
-
-
-
-
-
-	
-	
 	return 0;
 }
