@@ -1,6 +1,6 @@
 # FTRL online learning algorithm implemented in C++
 
-##Usage:
+## Usage:
 
 To train:
 
